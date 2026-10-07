@@ -1,0 +1,14 @@
+#   cp .env.example .env   # fill in TELEGRAM_TOKEN
+#   docker compose up -d --build
+services:
+  job-bot:
+    build: .
+    image: job-bot:local
+    env_file: .env
+    volumes:
+      - ./config:/app/config:ro   # edit search.yaml, then: docker compose restart
+      - job-data:/data            # SQLite: seen jobs + applications
+    restart: unless-stopped
+
+volumes:
+  job-data:

@@ -1,0 +1,69 @@
+# What to look for. Keywords are matched against the job title as whole words,
+# case-insensitive.
+keywords:
+  - devops
+  - devsecops
+  - sre
+  - site reliability
+  - platform engineer
+  - platform engineering
+  - cloud engineer
+  - cloud infrastructure
+  - infrastructure engineer
+  - kubernetes
+  - production engineer
+
+# Titles containing any of these are skipped.
+exclude:
+  - intern
+  - student
+  - director
+  - vp
+
+# A job matches if any location string contains one of these (lowercase)…
+locations:
+  - israel
+  - tel aviv
+  - herzliya
+  - ramat gan
+  - givatayim
+  - giv'atayim
+  - petah tikva
+  - petach tikva
+  - holon
+  - rishon
+  - bnei brak
+  - ra'anana
+  - raanana
+  - hod hasharon
+  - netanya
+  - rehovot
+  - haifa
+  - yokneam
+  - jerusalem
+  - beer sheva
+# …or its country code is one of these (Lever provides it).
+countries: [IL]
+
+# Daily digest. Days use English short names; Sun–Thu is the Israeli work week.
+timezone: Asia/Jerusalem
+digest_time: "09:00"
+digest_days: [sun, mon, tue, wed, thu]
+
+# Remind to follow up this many days after applying.
+followup_days: 7
+max_jobs_per_digest: 20
+
+# Companies to watch. The slug is the company's board name in the careers URL:
+#   greenhouse: boards.greenhouse.io/<slug>  or  job-boards.greenhouse.io/<slug>
+#   lever:      jobs.lever.co/<slug>
+#   ashby:      jobs.ashbyhq.com/<slug>
+companies:
+  - {name: Wiz, source: greenhouse, slug: wizinc}
+  - {name: Taboola, source: greenhouse, slug: taboola}
+  - {name: Similarweb, source: greenhouse, slug: similarweb}
+  - {name: Payoneer, source: greenhouse, slug: payoneer}
+  - {name: Axonius, source: greenhouse, slug: axonius}
+  - {name: Riskified, source: greenhouse, slug: riskified}
+  - {name: Melio, source: greenhouse, slug: melio}
+  - {name: AppsFlyer, source: greenhouse, slug: appsflyer}
