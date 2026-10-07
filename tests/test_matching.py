@@ -33,6 +33,7 @@ def test_relevant_titles_match(title):
         "DevOps Intern",
         "Director, DevOps",
         "Address Verification Specialist",  # contains "sre"-like letters but not the word
+        "Senior Data Platform Engineer",
     ],
 )
 def test_irrelevant_titles_dont_match(title):
@@ -65,4 +66,5 @@ def test_filter_jobs_sorts_and_filters():
 def test_config_values():
     assert CONFIG.digest_days == (0, 1, 2, 3, 4)  # Sun–Thu
     assert CONFIG.digest_time.hour == 9
-    assert len(CONFIG.companies) >= 5
+    assert len(CONFIG.companies) == 14
+    assert len({c.slug for c in CONFIG.companies}) == 14  # no duplicates

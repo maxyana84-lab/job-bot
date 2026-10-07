@@ -18,6 +18,7 @@ exclude:
   - intern
   - student
   - director
+  - data platform
   - vp
 
 # A job matches if any location string contains one of these (lowercase)…
@@ -67,3 +68,9 @@ companies:
   - {name: Riskified, source: greenhouse, slug: riskified}
   - {name: Melio, source: greenhouse, slug: melio}
   - {name: AppsFlyer, source: greenhouse, slug: appsflyer}
+  - {name: Gong, source: greenhouse, slug: gongio}
+  - {name: Via, source: greenhouse, slug: via}
+  - {name: Armis, source: greenhouse, slug: armissecurity}
+  - {name: SentinelOne, source: greenhouse, slug: sentinellabs}
+  - {name: Forter, source: greenhouse, slug: forter}
+  - {name: Yotpo, source: greenhouse, slug: yotpo}

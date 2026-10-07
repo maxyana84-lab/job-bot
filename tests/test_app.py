@@ -18,3 +18,14 @@ def test_application_wires_commands_and_daily_digest(tmp_path):
     assert {"jobs", "all", "applied", "followups", "companies", "stats"} <= commands
     assert [job.name for job in app.job_queue.jobs()] == ["daily_digest"]
     app.bot_data["storage"].close()
+
+
+async def test_network_errors_are_logged_not_raised(caplog):
+    from types import SimpleNamespace
+
+    from telegram.error import TimedOut
+
+    from app.main import on_error
+
+    await on_error(None, SimpleNamespace(error=TimedOut()))
+    assert "network error" in caplog.text

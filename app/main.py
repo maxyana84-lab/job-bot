@@ -15,7 +15,7 @@ from telegram import (
     Update,
 )
 from telegram.constants import ParseMode
-from telegram.error import TelegramError
+from telegram.error import NetworkError, TelegramError
 from telegram.ext import (
     Application,
     ApplicationBuilder,
@@ -35,6 +35,7 @@ logging.getLogger("httpx").setLevel(logging.WARNING)  # would log the bot token 
 log = logging.getLogger("jobbot")
 
 NO_PREVIEW = LinkPreviewOptions(is_disabled=True)
+TELEGRAM_TIMEOUT = 30.0  # seconds
 
 COMMANDS = [
     BotCommand("jobs", "Check for new jobs now"),
@@ -326,9 +327,21 @@ async def on_startup(app: Application) -> None:
     app.bot_data["http"] = httpx.AsyncClient(
         timeout=20, headers={"User-Agent": "job-bot/1.0 (personal job search)"}
     )
-    await app.bot.set_my_commands(COMMANDS)
+    try:
+        await app.bot.set_my_commands(COMMANDS)
+    except TelegramError as exc:
+        # The command menu is cosmetic: a slow Telegram API must not stop the bot.
+        log.warning("Could not set the command menu (%s); continuing", exc)
     if not app.bot_data["settings"].allowed_chat_ids:
         log.warning("ALLOWED_CHAT_IDS is empty: send /start to the bot to get your chat id.")
+
+
+async def on_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log handler errors in one line; network blips are expected and not worth a traceback."""
+    if isinstance(context.error, NetworkError):
+        log.warning("Telegram network error: %s", context.error)
+    else:
+        log.error("Unhandled error", exc_info=context.error)
 
 
 async def on_shutdown(app: Application) -> None:
@@ -341,6 +354,13 @@ def build_application(settings: Settings) -> Application:
     app = (
         ApplicationBuilder()
         .token(settings.telegram_token)
+        # Generous timeouts: home Wi-Fi or a busy Telegram API shouldn't crash the bot.
+        .connect_timeout(TELEGRAM_TIMEOUT)
+        .read_timeout(TELEGRAM_TIMEOUT)
+        .write_timeout(TELEGRAM_TIMEOUT)
+        .pool_timeout(TELEGRAM_TIMEOUT)
+        .get_updates_connect_timeout(TELEGRAM_TIMEOUT)
+        .get_updates_read_timeout(TELEGRAM_TIMEOUT)
         .post_init(on_startup)
         .post_shutdown(on_shutdown)
         .build()
@@ -360,6 +380,7 @@ def build_application(settings: Settings) -> Application:
     ]:
         app.add_handler(CommandHandler(name, handler))
     app.add_handler(CallbackQueryHandler(button))
+    app.add_error_handler(on_error)
 
     app.job_queue.run_daily(
         daily_digest, time=settings.search.digest_time, days=settings.search.digest_days
@@ -374,7 +395,7 @@ def main() -> None:
         len(settings.search.companies),
         settings.search.digest_time.strftime("%H:%M"),
     )
-    build_application(settings).run_polling(drop_pending_updates=True)
+    build_application(settings).run_polling(drop_pending_updates=True, bootstrap_retries=5)
 
 
 if __name__ == "__main__":
